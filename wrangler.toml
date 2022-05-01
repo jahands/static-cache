@@ -2,6 +2,8 @@ name = "static-cache"
 main = "src/index.ts"
 compatibility_date = "2022-05-01"
 
+routes = ["cache.uuid.rocks/*"]
+
 [[r2_buckets]]
 binding = "STATIC_CACHE"
 bucket_name = "static-cache"
