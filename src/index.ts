@@ -44,13 +44,17 @@ export default {
       });
     } else {
       const response = await fetch(urlToCache);
-      console.log(" RESPONSE ", response);
+
+      const meta: R2HTTPMetadata = {
+        cacheControl: "public, max-age=86400",
+        contentType: response.headers.get("Content-Type") || "text/plain",
+        contentDisposition: response.headers.get("Content-Disposition") || undefined,
+        contentEncoding: response.headers.get("Content-Encoding") || undefined,
+        contentLanguage: response.headers.get("Content-Language") || undefined,
+      }
       if (response.ok) {
         await env.STATIC_CACHE.put(CACHE_KEY(urlToCache), response.body, {
-          httpMetadata: {
-            ...response.headers,
-            cacheControl: "public, max-age=86400",
-          },
+          httpMetadata: meta
         });
       }
       return response;
