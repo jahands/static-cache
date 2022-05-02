@@ -1,7 +1,11 @@
 import sha1 from "sha1";
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(
+    request: Request,
+    env: Env,
+    ctx: ExecutionContext
+  ): Promise<Response> {
     const url = new URL(request.url);
 
     if (
@@ -67,7 +71,7 @@ export default {
         contentLanguage: response.headers.get("Content-Language") || undefined,
       };
       if (response.ok) {
-        await env.STATIC_CACHE.put(
+        const cachePromise = env.STATIC_CACHE.put(
           CACHE_KEY(urlToCache, urlSha1),
           response.clone().body,
           {
@@ -78,6 +82,7 @@ export default {
             },
           }
         );
+        ctx.waitUntil(cachePromise);
       }
       return response;
     }
