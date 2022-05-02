@@ -26,7 +26,7 @@ export default {
       );
       headers.set(
         "Cache-Control",
-        cachedResponse.httpMetadata.cacheControl || "public, max-age=604800" // 1 year
+        cachedResponse.httpMetadata.cacheControl || "public, max-age=604800" // 1 week
       );
       headers.set(
         "Content-Disposition",
@@ -49,7 +49,7 @@ export default {
       const response = await fetch(urlToCache);
 
       const meta: R2HTTPMetadata = {
-        cacheControl: "public, max-age=604800", // 1 year
+        cacheControl: "public, max-age=604800", // 1 week
         contentType: response.headers.get("Content-Type") || "text/plain",
         contentDisposition: response.headers.get("Content-Disposition") || undefined,
         contentEncoding: response.headers.get("Content-Encoding") || undefined,
