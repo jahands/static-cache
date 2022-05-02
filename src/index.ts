@@ -74,7 +74,7 @@ export default {
             httpMetadata: meta,
             customMetadata: {
               url: urlToCache,
-              urlSha1: urlSha1,
+              url_sha1: urlSha1,
             },
           }
         );
