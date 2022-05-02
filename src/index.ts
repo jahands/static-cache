@@ -32,6 +32,7 @@ export default {
         "Content-Disposition",
         cachedResponse.httpMetadata.contentDisposition || "inline"
       );
+      console.log('disposition ', cachedResponse.httpMetadata.contentDisposition)
       if (cachedResponse.httpMetadata.contentEncoding) {
         headers.set(
           "Content-Encoding",
