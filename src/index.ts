@@ -26,7 +26,7 @@ export default {
       );
       headers.set(
         "Cache-Control",
-        cachedResponse.httpMetadata.cacheControl || "public, max-age=86400"
+        cachedResponse.httpMetadata.cacheControl || "public, max-age=31536000" // 1 year
       );
       headers.set(
         "Content-Disposition",
@@ -38,6 +38,8 @@ export default {
           cachedResponse.httpMetadata.contentEncoding
         );
       }
+      headers.set("X-R2-Cache-Hit", "true");
+      headers.set("Content-Length", cachedResponse.size.toString())
       return new Response(cachedResponse.body, {
         status: 200,
         headers: headers,
@@ -46,14 +48,14 @@ export default {
       const response = await fetch(urlToCache);
 
       const meta: R2HTTPMetadata = {
-        cacheControl: "public, max-age=86400",
+        cacheControl: "public, max-age=31536000", // 1 year
         contentType: response.headers.get("Content-Type") || "text/plain",
         contentDisposition: response.headers.get("Content-Disposition") || undefined,
         contentEncoding: response.headers.get("Content-Encoding") || undefined,
         contentLanguage: response.headers.get("Content-Language") || undefined,
       }
       if (response.ok) {
-        await env.STATIC_CACHE.put(CACHE_KEY(urlToCache), response.body, {
+        await env.STATIC_CACHE.put(CACHE_KEY(urlToCache), response.clone().body, {
           httpMetadata: meta
         });
       }
