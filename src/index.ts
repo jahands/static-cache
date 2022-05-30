@@ -70,7 +70,7 @@ export default {
       const response = await fetch(urlToCache);
 
       const meta: R2HTTPMetadata = {
-        cacheControl: "public, max-age=604800", // 1 week
+        cacheControl: "public, max-age=604800, immutable", // 1 week
         contentType: response.headers.get("Content-Type") || "text/plain",
         contentDisposition:
           response.headers.get("Content-Disposition") || undefined,
