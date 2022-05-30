@@ -103,6 +103,6 @@ export default {
 
 function CACHE_KEY(url: string, hash: string) {
   // 1024 is the max length of a key in the S3 spec
-  const urlWithoutProtocal = url.replace(/^https?:\/\//, "");
-  return `cache/${urlWithoutProtocal}`.slice(0, 1024 - hash.length - 7) + "--sha1=" + hash;
+  const urlWithoutScheme = url.replace(/^https?:\/\//, "");
+  return `cache/${urlWithoutScheme}`.slice(0, 1024 - hash.length - 7) + "--sha1=" + hash;
 }
