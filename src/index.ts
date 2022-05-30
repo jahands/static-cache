@@ -102,7 +102,8 @@ export default {
 /** Used adds a prefix to r2 cache keys */
 
 function CACHE_KEY(url: string, hash: string) {
-  // 1024 is the max length of a key in the S3 spec
+  // Remove the scheme to make r2 keys easier to work with in rclone
   const urlWithoutScheme = url.replace(/^https?:\/\//, "");
+  // 1024 is the max length of a key in the S3 spec
   return `cache/${urlWithoutScheme}`.slice(0, 1024 - hash.length - 7) + "--sha1=" + hash;
 }
