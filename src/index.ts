@@ -65,7 +65,7 @@ export default {
       });
     } else {
       if (!keys.write.includes(url.searchParams.get("key") || '')) {
-        return new Response("Invalid API key", { status: 403 });
+        return new Response("forbidden", { status: 403 });
       }
       const response = await fetch(urlToCache);
 
@@ -86,6 +86,7 @@ export default {
             customMetadata: {
               url: urlToCache,
               url_sha1: urlSha1,
+              pathname: url.pathname, // Eg. /dsp/Mining_Machine - for organization only
             },
           }
         );
