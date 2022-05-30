@@ -41,7 +41,9 @@ export default {
       );
       headers.set(
         "Cache-Control",
-        cachedResponse.httpMetadata.cacheControl || "public, max-age=604800" // 1 week
+        "public, max-age=604800, immutable"
+        // Removing the below line because I have no need for custom cache-control headers per object
+        // cachedResponse.httpMetadata.cacheControl || "public, max-age=604800, immutable" // 1 week
       );
       headers.set(
         "Content-Disposition",
