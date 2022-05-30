@@ -7,10 +7,14 @@ export default {
     ctx: ExecutionContext
   ): Promise<Response> {
     const url = new URL(request.url);
+    const keys = {
+      read: [env.API_KEY, env.WRITE_API_KEY],
+      write: [env.WRITE_API_KEY]
+    }
 
     if (
       !url.searchParams.has("key") ||
-      url.searchParams.get("key") !== env.API_KEY
+      !keys.read.includes(url.searchParams.get("key") || '')
     ) {
       return new Response("Invalid API key", { status: 403 });
     }
@@ -60,6 +64,9 @@ export default {
         headers: headers,
       });
     } else {
+      if (!keys.write.includes(url.searchParams.get("key") || '')) {
+        return new Response("Invalid API key", { status: 403 });
+      }
       const response = await fetch(urlToCache);
 
       const meta: R2HTTPMetadata = {
