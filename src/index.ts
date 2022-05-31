@@ -76,6 +76,7 @@ export default {
         status: 200,
         headers: headers,
       });
+      // Add R2 response to cache.
       ctx.waitUntil(cache.put(request, response.clone()));
       return response;
     } else {
