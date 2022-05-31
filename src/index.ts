@@ -18,6 +18,13 @@ export default {
     ) {
       return new Response("Invalid API key", { status: 403 });
     }
+    // Check standard cache first
+    const cache = caches.default;
+    const match = await cache.match(request);
+    if (match) {
+      return match;
+    }
+    // Check R2 cache
     const urlToCache = url.searchParams.get("url");
     if (!urlToCache) {
       return new Response("Missing url parameter", { status: 400 });
@@ -65,10 +72,12 @@ export default {
       }
       headers.set("X-R2-Cache-Hit", "true");
       headers.set("Content-Length", cachedResponse.size.toString());
-      return new Response(cachedResponse.body, {
+      const response = new Response(cachedResponse.body, {
         status: 200,
         headers: headers,
       });
+      ctx.waitUntil(cache.put(request, response.clone()));
+      return response;
     } else {
       if (!keys.write.includes(url.searchParams.get("key") || '')) {
         return new Response("forbidden", { status: 403 });
