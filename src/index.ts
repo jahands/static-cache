@@ -9,12 +9,12 @@ export default {
     const url = new URL(request.url);
     const keys = {
       read: [env.API_KEY, env.WRITE_API_KEY],
-      write: [env.WRITE_API_KEY]
-    }
+      write: [env.WRITE_API_KEY],
+    };
 
     if (
       !url.searchParams.has("key") ||
-      !keys.read.includes(url.searchParams.get("key") || '')
+      !keys.read.includes(url.searchParams.get("key") || "")
     ) {
       return new Response("Invalid API key", { status: 403 });
     }
@@ -52,10 +52,7 @@ export default {
         // Removing the below line because I have no need for custom cache-control headers per object
         // cachedResponse.httpMetadata.cacheControl || "public, max-age=604800, immutable" // 1 week
       );
-      headers.set(
-        "CDN-Cache-Control",
-        "public, max-age=604800, immutable"
-      )
+      headers.set("CDN-Cache-Control", "public, max-age=604800, immutable");
       headers.set(
         "Content-Disposition",
         cachedResponse.httpMetadata.contentDisposition || "inline"
@@ -80,7 +77,7 @@ export default {
       ctx.waitUntil(cache.put(request, response.clone()));
       return response;
     } else {
-      if (!keys.write.includes(url.searchParams.get("key") || '')) {
+      if (!keys.write.includes(url.searchParams.get("key") || "")) {
         return new Response("forbidden", { status: 403 });
       }
       const response = await fetch(urlToCache);
@@ -119,5 +116,9 @@ function CACHE_KEY(url: string, hash: string) {
   // Remove the scheme to make r2 keys easier to work with in rclone
   const urlWithoutScheme = url.replace(/^https?:\/\//, "");
   // 1024 is the max length of a key in the S3 spec
-  return `cache/${urlWithoutScheme}`.slice(0, 1024 - hash.length - 7) + "--sha1=" + hash;
+  return (
+    `cache/${urlWithoutScheme}`.slice(0, 1024 - hash.length - 7) +
+    "--sha1=" +
+    hash
+  );
 }
