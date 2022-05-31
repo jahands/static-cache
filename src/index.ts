@@ -46,6 +46,10 @@ export default {
         // cachedResponse.httpMetadata.cacheControl || "public, max-age=604800, immutable" // 1 week
       );
       headers.set(
+        "CDN-Cache-Control",
+        "public, max-age=604800, immutable"
+      )
+      headers.set(
         "Content-Disposition",
         cachedResponse.httpMetadata.contentDisposition || "inline"
       );
