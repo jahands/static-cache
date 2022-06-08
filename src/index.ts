@@ -1,4 +1,28 @@
 import sha1 from "sha1";
+const imageExtensions = [
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".webp",
+  ".bmp",
+  ".gif",
+  ".tiff",
+];
+/** Fix content-disposition to always be inline for images */
+function fixContentDisposition(url: URL, contentDisposition: string | null | undefined) {
+  if (!contentDisposition) {
+    return "inline"
+  }
+  if (
+    contentDisposition.includes("attachment") &&
+    imageExtensions.some((ext) => url.pathname.includes(ext))
+  ) {
+    // Make sure it's not set to 'attachment' for images.
+    // Doing this at read time in case we mess it up - don't want to store bad headers.
+    contentDisposition = contentDisposition.replaceAll("attachment", "inline");
+  }
+  return contentDisposition;
+}
 
 export default {
   async fetch(
@@ -55,11 +79,10 @@ export default {
       headers.set("CDN-Cache-Control", "public, max-age=604800, immutable");
       headers.set(
         "Content-Disposition",
-        cachedResponse.httpMetadata.contentDisposition || "inline"
-      );
-      console.log(
-        "disposition ",
-        cachedResponse.httpMetadata.contentDisposition
+        fixContentDisposition(
+          url,
+          cachedResponse.httpMetadata.contentDisposition
+        )
       );
       if (cachedResponse.httpMetadata.contentEncoding) {
         headers.set(
@@ -105,7 +128,15 @@ export default {
         );
         ctx.waitUntil(cachePromise);
       }
-      return response;
+      const fixedResponse = new Response(response.body, response);
+      fixedResponse.headers.set(
+        "Content-Disposition",
+        fixContentDisposition(
+          url,
+          response.headers.get("Content-Disposition")
+        )
+      );
+      return fixedResponse;
     }
   },
 };
