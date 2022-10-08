@@ -49,17 +49,18 @@ export default {
       return match;
     }
     // Check R2 cache
-    const urlToCache = url.searchParams.get("url");
-    if (!urlToCache) {
+    const urlToCacheString = url.searchParams.get("url");
+    if (!urlToCacheString) {
       return new Response("Missing url parameter", { status: 400 });
     }
-    const urlSha1 = sha1(urlToCache);
+    const urlToCache = new URL(urlToCacheString)
+    const urlSha1 = sha1(urlToCache.toString());
 
     console.log("urlSha1: ", urlSha1);
     let cachedResponse: R2ObjectBody | null;
     try {
       cachedResponse = await env.STATIC_CACHE.get(
-        CACHE_KEY(urlToCache, urlSha1)
+        CACHE_KEY(urlToCache.toString(), urlSha1)
       );
     } catch {
       cachedResponse = null;
@@ -103,7 +104,7 @@ export default {
       if (!keys.write.includes(url.searchParams.get("key") || "")) {
         return new Response("forbidden", { status: 403 });
       }
-      const response = await fetch(urlToCache);
+      const response = await fetch(urlToCache.toString());
 
       const meta: R2HTTPMetadata = {
         cacheControl: "public, max-age=604800, immutable", // 1 week
@@ -116,10 +117,9 @@ export default {
       if (response.ok) {
         let body: ReadableStream | ArrayBuffer | null
         // Parse the url to get the host
-        const url2 = new URL(urlToCache);
         // List of hosts that we need to read the whole body before sending to R2
         // because they don't send the content-length header
-        if (['icons.duckduckgo.com'].includes(url2.hostname)) {
+        if (['icons.duckduckgo.com'].includes(urlToCache.hostname)) {
           // DuckDuckGo icons don't give a content-length header, so we need to read the whole body
           // into memory to get the size.
           body = await response.clone().arrayBuffer();
@@ -127,12 +127,12 @@ export default {
           body = response.clone().body;
         }
         const cachePromise = env.STATIC_CACHE.put(
-          CACHE_KEY(urlToCache, urlSha1),
+          CACHE_KEY(urlToCache.toString(), urlSha1),
           body,
           {
             httpMetadata: meta,
             customMetadata: {
-              url: urlToCache,
+              url: urlToCache.toString(),
               url_sha1: urlSha1,
               pathname: url.pathname, // Eg. /dsp/Mining_Machine - for organization only
             },
