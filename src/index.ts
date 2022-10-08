@@ -31,6 +31,34 @@ export default {
     ctx: ExecutionContext
   ): Promise<Response> {
     const url = new URL(request.url);
+    const cache = caches.default;
+
+    // Serve a favicon
+    if (url.pathname === "/favicon.ico") {
+      // check cache first
+      let cacheResponse = await cache.match(request);
+      if (cacheResponse) {
+        return cacheResponse;
+      }
+      const r2Res = await env.STATIC_CACHE.get("favicon.jpg");
+      if (r2Res) {
+        const res = new Response(r2Res.body, {
+          headers: {
+            "content-type": "image/jpeg",
+            "content-disposition": "inline",
+            "content-length": r2Res.size.toString(),
+            "cache-control": "public, max-age=31536000", // 1 year
+          },
+        });
+        // save to cache
+        ctx.waitUntil(cache.put(request, res.clone()));
+        return res;
+      } else {
+        return new Response("Not found", { status: 404 });
+      }
+    }
+
+    // Now serve the regular stuff
     const keys = {
       read: [env.API_KEY, env.WRITE_API_KEY],
       write: [env.WRITE_API_KEY],
@@ -43,7 +71,6 @@ export default {
       return new Response("Invalid API key", { status: 403 });
     }
     // Check standard cache first
-    const cache = caches.default;
     const match = await cache.match(request);
     if (match) {
       return match;
