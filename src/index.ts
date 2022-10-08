@@ -114,9 +114,21 @@ export default {
         contentLanguage: response.headers.get("Content-Language") || undefined,
       };
       if (response.ok) {
+        let body: ReadableStream | ArrayBuffer | null
+        // Parse the url to get the host
+        const url2 = new URL(urlToCache);
+        // List of hosts that we need to read the whole body before sending to R2
+        // because they don't send the content-length header
+        if (['icons.duckduckgo.com'].includes(url2.hostname)) {
+          // DuckDuckGo icons don't give a content-length header, so we need to read the whole body
+          // into memory to get the size.
+          body = await response.clone().arrayBuffer();
+        } else {
+          body = response.clone().body;
+        }
         const cachePromise = env.STATIC_CACHE.put(
           CACHE_KEY(urlToCache, urlSha1),
-          response.clone().body,
+          body,
           {
             httpMetadata: meta,
             customMetadata: {
