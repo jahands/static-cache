@@ -119,7 +119,7 @@ export default {
         // Parse the url to get the host
         // List of hosts that we need to read the whole body before sending to R2
         // because they don't send the content-length header
-        if (['icons.duckduckgo.com'].includes(urlToCache.hostname)) {
+        if (['icons.duckduckgo.com', 'www.google.com'].includes(urlToCache.hostname)) {
           // DuckDuckGo icons don't give a content-length header, so we need to read the whole body
           // into memory to get the size.
           body = await response.clone().arrayBuffer();
