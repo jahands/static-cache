@@ -107,7 +107,8 @@ export default {
       return response;
     } else {
       if (!keys.write.includes(url.searchParams.get("key") || "")) {
-        return new Response("forbidden", { status: 403 });
+        // Tell clients it's not found if they don't have write access
+        return new Response("not found", { status: 404 });
       }
       const response = await fetch(urlToCache.toString());
 
