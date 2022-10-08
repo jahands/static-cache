@@ -49,9 +49,14 @@ export default {
       return match;
     }
     // Check R2 cache
-    const urlToCacheString = url.searchParams.get("url");
+    let urlToCacheString = url.searchParams.get("url");
     if (!urlToCacheString) {
       return new Response("Missing url parameter", { status: 400 });
+    }
+    // Params get screwed up with decoding, so we pass them separately as base64
+    const params = url.searchParams.get('params')
+    if (params) {
+      urlToCacheString += atob(decodeURIComponent(params))
     }
     const urlToCache = new URL(urlToCacheString)
     const urlSha1 = sha1(urlToCache.toString());
