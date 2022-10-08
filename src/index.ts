@@ -56,7 +56,13 @@ export default {
     // Params get screwed up with decoding, so we pass them separately as base64
     const params = url.searchParams.get('params')
     if (params) {
-      urlToCacheString += atob(decodeURIComponent(params))
+      let decodedParams = atob(decodeURIComponent(params))
+      // We should be consistent with use of ? in the encoded params,
+      // but just in case, we'll add it if it's missing
+      if (!decodedParams.startsWith('?')) {
+        decodedParams = '?' + decodedParams
+      }
+      urlToCacheString += decodedParams
     }
     const urlToCache = new URL(urlToCacheString)
     const urlSha1 = sha1(urlToCache.toString());
