@@ -91,8 +91,10 @@ export default {
       }
       urlToCacheString += decodedParams
     }
-    // Only use this to parse out hostname - everything else should
-    // use urlToCacheString to avoid issues with encoding
+    /**
+     * Only use this to parse out hostname - everything else should
+     * use urlToCacheString to avoid issues with encoding
+     */
     const urlToCache = new URL(urlToCacheString)
     const urlSha1 = sha1(urlToCacheString);
 
