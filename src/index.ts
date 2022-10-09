@@ -92,13 +92,13 @@ export default {
       urlToCacheString += decodedParams
     }
     const urlToCache = new URL(urlToCacheString)
-    const urlSha1 = sha1(urlToCache.toString());
+    const urlSha1 = sha1(urlToCacheString);
 
     console.log("urlSha1: ", urlSha1);
     let cachedResponse: R2ObjectBody | null;
     try {
       cachedResponse = await env.STATIC_CACHE.get(
-        CACHE_KEY(urlToCache.toString(), urlSha1)
+        CACHE_KEY(urlToCacheString, urlSha1)
       );
     } catch {
       cachedResponse = null;
@@ -143,7 +143,7 @@ export default {
         // Tell clients it's not found if they don't have write access
         return new Response("not found", { status: 404 });
       }
-      const response = await fetch(urlToCache.toString());
+      const response = await fetch(urlToCacheString);
 
       const meta: R2HTTPMetadata = {
         cacheControl: "public, max-age=604800, immutable", // 1 week
@@ -166,12 +166,12 @@ export default {
           body = response.clone().body;
         }
         const cachePromise = env.STATIC_CACHE.put(
-          CACHE_KEY(urlToCache.toString(), urlSha1),
+          CACHE_KEY(urlToCacheString, urlSha1),
           body,
           {
             httpMetadata: meta,
             customMetadata: {
-              url: urlToCache.toString(),
+              url: urlToCacheString,
               url_sha1: urlSha1,
               pathname: url.pathname, // Eg. /dsp/Mining_Machine - for organization only
             },
