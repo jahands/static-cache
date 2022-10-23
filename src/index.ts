@@ -7,6 +7,7 @@ const imageExtensions = [
   ".bmp",
   ".gif",
   ".tiff",
+  ".ico"
 ];
 /** Fix content-disposition to always be inline for images */
 function fixContentDisposition(url: URL, contentDisposition: string | null | undefined) {
