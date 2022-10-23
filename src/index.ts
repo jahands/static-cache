@@ -164,6 +164,8 @@ export default {
 
         // List of hosts that we need to read the whole body before sending to R2
         // because they don't send the content-length header
+        // TODO: change this if we ever need to cache a large file from one of these hosts
+        // or it otherwise becomes a problem
         const noStreamingHosts = [
           'icons.duckduckgo.com',
           'www.google.com',
