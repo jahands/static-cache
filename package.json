@@ -10,7 +10,7 @@
   "private": true,
   "scripts": {
     "start": "wrangler dev",
-    "publish": "wrangler publish"
+    "deploy": "wrangler publish"
   },
   "dependencies": {
     "sha1": "^1.1.1"

@@ -149,7 +149,7 @@ export default {
         return new Response("not found", { status: 404 });
       }
       const response = await fetch(urlToCacheString);
-
+      console.log(request.headers.get('blah') === 'hello')
       const meta: R2HTTPMetadata = {
         cacheControl: "public, max-age=604800, immutable", // 1 week
         contentType: response.headers.get("Content-Type") || "text/plain",
@@ -169,7 +169,8 @@ export default {
         const noStreamingHosts = [
           'icons.duckduckgo.com',
           'www.google.com',
-          'iconarchive.com'
+          'iconarchive.com',
+          'cdn.weatherapi.com',
         ]
         // TEMP: Just buffer all responses for now - if it ever becomes an issue, we can change it
         if (true && noStreamingHosts.includes(urlToCache.hostname)) {
