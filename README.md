@@ -1,3 +1,5 @@
+# MOVED TO https://github.com/jahands/workers-monorepo/tree/main/apps/mc-maps
+
 API key in 1P-hs22r
 
 There are two keys - a read key and a read/write key.
